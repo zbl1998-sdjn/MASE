@@ -44,4 +44,6 @@ collect_ignore = [
     "test_benchmark_harness.py",
     # Needs longmemeval_oracle.json which is gitignored (size). Run via scripts/run_lme*.
     "test_temporal_parser.py",
+    # Live-Ollama smoke script (not a real pytest test); requires running ollama daemon.
+    "test_ollama.py",
 ]
