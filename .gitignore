@@ -38,7 +38,8 @@ data/mase_memory.db
 data/mase_memory.db-wal
 data/mase_memory.db-shm
 memory_runs/
-memory/
+# Per-day markdown audit logs at repo root only — do NOT match mase_tools/memory/ source pkg
+/memory/
 results/*.json
 results/external/
 scripts/_*.log
