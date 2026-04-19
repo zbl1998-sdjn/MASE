@@ -1,3 +1,5 @@
+<div align="center">
+
 # MASE 2.0 (Memory-Augmented Smart Entity)
 **Schema-less SQLite + per-day Markdown — dual-whitebox memory for LLM agents.**
 **Survives 256k adversarial context at 88% with a 7B local model.**
@@ -9,16 +11,19 @@
 ![NoLiMa-32k](https://img.shields.io/badge/NoLiMa--32k-60.71%25%20(%2B58.9pp)-red)
 ![LongMemEval](https://img.shields.io/badge/LongMemEval--S-84.8%25-blueviolet)
 
-<p align="center">
-  <b>中文</b> | <a href="docs/README_en.md">English</a> (WIP)
-</p>
+<b>中文</b> | <a href="docs/README_en.md">English</a> (WIP)
 
-![MASE 2.0 Architecture](docs/assets/banner.png)
+![MASE vs baseline on NoLiMa long-context (3-way comparison)](docs/assets/nolima_3way_lineplot.png)
 
+</div>
+
+> ### 💡 The Anti-RAG Manifesto
+>
 > **最好的 AI 记忆，不应该是黑盒里的向量浮点数，而是随时可被 `SELECT / UPDATE` 的结构化事实。**
+>
 > *The best AI memory isn't a black-box of floating-point vectors — it's structured facts you can `UPDATE` at 3 AM.*
 >
-> — The Anti-RAG Manifesto ([read more ↓](#️-为什么要重构-mase-20the-anti-rag-manifesto))
+> *— MASE 2.0, [read the full manifesto ↓](#️-为什么要重构-mase-20the-anti-rag-manifesto)*
 
 ---
 
@@ -115,9 +120,12 @@ MASE 同时把对话写入两层人类可读的存储:
 ```python
 from integrations.langchain.mase_memory import MASEMemory
 
-memory = MASEMemory(db_path="data/mase_memory.db", user_id="zbl1998")
+memory = MASEMemory(thread_id="zbl1998::main", top_k=8)
 agent_executor.invoke({"input": "我上次说的预算是多少？"}, config={"memory": memory})
 ```
+
+> 真实签名: `MASEMemory(memory_key="history", return_messages=True, top_k=8, thread_id="langchain::default")`.
+> DB 路径走 `MASE_DB_PATH` env (默认 `<project>/data/mase_memory.db`), 无需在调用处指定. 见 `mase_tools/memory/db_core.py::_resolve_db_path`.
 
 告别 `ConversationBufferMemory` 的 token 上限，告别 `VectorStoreRetrieverMemory` 的黑盒漂移。
 **断电、重启、跨进程，下一句对话都能 `SELECT` 出 30 个 session 前的事实。**
