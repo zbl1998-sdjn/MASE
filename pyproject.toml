@@ -18,7 +18,7 @@ dependencies = [
 dev = [
     "pytest>=8.0,<9.0",
     "pytest-xdist>=3.0,<4.0",
-    "ruff>=0.6,<1.0",
+    "ruff==0.15.10",
     "mypy>=1.10,<2.0",
     "pre-commit>=3.5,<5.0",
 ]
@@ -95,7 +95,7 @@ ignore = [
 "src/mase/structured_log.py" = ["BLE001"]        # logging path: writes must never throw
 "src/mase/fact_sheet.py" = ["BLE001"]
 "src/mase/metrics.py" = ["BLE001", "UP031"]      # numeric formatting kept as %.2f%% for human readability
-"tests/**" = ["BLE001", "B017"]   # tests frequently catch broadly on purpose, including raises(Exception)
+"tests/**" = ["BLE001", "B017", "I001"]   # tests frequently catch broadly on purpose; import order tolerated
 "scripts/**" = ["BLE001", "B905", "B007", "I001"]   # entry/diagnostic scripts: zip pairing & loop vars are intentional
 # TODO(benchmarks/runner.py:678 — resolved): `baseline_infra_error` is now
 # persisted into attempt_rows; retry semantics unchanged. Still ignoring BLE001
