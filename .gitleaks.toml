@@ -1,0 +1,10 @@
+# gitleaks config — extends the built-in default ruleset.
+# Add project-specific rules here if you ever need them.
+# To audit the entire history:  gitleaks detect --source . --redact
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "env template uses placeholder __replace_me__ values"
+paths = ['''\.env\.example$''']

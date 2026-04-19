@@ -70,3 +70,13 @@ scripts/_*.err
 scripts/_*.ps1
 scripts/_external_logs/
 
+
+# --- secrets / private notes (added 2026-04-19 after key-leak audit) ---
+/docs/notes/
+*.secret
+*.secrets
+secrets.*
+*api_key*
+*api-key*
+.env.local
+.env.*.local

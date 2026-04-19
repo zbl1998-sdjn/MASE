@@ -1,6 +1,13 @@
 minimum_pre_commit_version: "3.5.0"
 
 repos:
+  # ── secret scanning (PRIMARY DEFENSE, added 2026-04-19 after key-leak audit) ──
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+        name: gitleaks (block API keys / secrets)
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
