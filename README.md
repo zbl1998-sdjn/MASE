@@ -80,14 +80,14 @@ python mase_cli.py
 完整示例列表请看 [examples/README.md](examples/README.md)。
 
 ## Integrations
-n- LangChain `BaseChatMemory`
+- LangChain `BaseChatMemory`
 - LlamaIndex `BaseMemory`
 - MCP server（Claude Desktop / Cursor）
 - OpenAI-compatible endpoint
 
 ```python
 from integrations.langchain.mase_memory import MASEMemory
-nmemory = MASEMemory(thread_id="zbl1998::main", top_k=8)
+memory = MASEMemory(thread_id="zbl1998::main", top_k=8)
 agent_executor.invoke({"input": "我上次说的预算是多少？"}, config={"memory": memory})
 ```
 
