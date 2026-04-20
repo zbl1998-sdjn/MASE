@@ -65,142 +65,66 @@ MASE 的主叙事是记忆系统，不是 runtime 功能列表。
 - 它不是实验室概念稿，而是已经被 benchmark 和审计反复打磨过的工程项目
 
 
-## 🚀 快速开始 (Quick Start)
-
-### 0. 一键 clone + install (3 分钟)
+## Quick Start
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/zbl1998-sdjn/MASE-demo.git
-cd MASE-demo
-
-# 2. 安装依赖（建议先 python -m venv .venv && source .venv/bin/activate）
+git clone https://github.com/zbl1998-sdjn/MASE.git
+cd MASE
 pip install -e ".[dev]"
-
-# 3. 复制环境变量模板（按需填入 GLM/Kimi/OpenAI key，本地模式可空）
-cp .env.example .env
-
-# 4. 冒烟测试（69 个单测应全绿）
 python -m pytest tests/ -q
-```
-
-### 环境要求
-- Python 3.10+
-- Ollama（当前默认 benchmark baseline 使用本地 Ollama）
-- 对应的 LLM API Key (.env 配置)
-
-### 本地 Ollama 模型准备（当前测试栈）
-当前 `config.json` 默认使用的是本地小模型编排，不再把 `Qwen3.5-27B` 作为默认测试范围。开跑前请先拉齐以下模型：
-
-```bash
-ollama pull qwen2.5:0.5b
-ollama pull qwen2.5:1.5b
-ollama pull qwen2.5:3b
-ollama pull qwen2.5:7b
-ollama pull deepseek-r1:7b
-ollama pull ibm/granite3.3:2b
-ollama pull lfm2.5-thinking:1.2b
-```
-
-其中：
-- `qwen2.5:0.5b / 1.5b / 3b / 7b`：路由、记事、通用执行
-- `deepseek-r1:7b`：深度推理 / planner / 核查
-- `ibm/granite3.3:2b`、`lfm2.5-thinking:1.2b`：英文与辅助链路
-
-### 1. 启动记忆控制台 (CLI)
-随时查看或修改 AI 的记忆状态：
-```bash
 python mase_cli.py
 ```
 
-### 2. 运行后台记忆整理 (Memory GC)
-手动触发或设置定时任务，让 AI 提纯最近的对话记录：
-```bash
-python mase_tools/memory/gc_agent.py
+如果你只是第一次上手，优先跑 `python mase_cli.py`。
+更完整的 benchmark 复现命令请看 [BENCHMARKS.md](BENCHMARKS.md)，
+完整示例列表请看 [examples/README.md](examples/README.md)。
+
+## Integrations
+n- LangChain `BaseChatMemory`
+- LlamaIndex `BaseMemory`
+- MCP server（Claude Desktop / Cursor）
+- OpenAI-compatible endpoint
+
+```python
+from integrations.langchain.mase_memory import MASEMemory
+nmemory = MASEMemory(thread_id="zbl1998::main", top_k=8)
+agent_executor.invoke({"input": "我上次说的预算是多少？"}, config={"memory": memory})
 ```
 
-### 3. 启动主 LangGraph 引擎
-体验完整的 路由->记忆检索->规划->外部工具->执行 的全流程：
-```bash
-python langgraph_orchestrator.py
-```
+## Limitations
 
----
+MASE 当前最强的是**事实更新、跨 session 记忆、一致性治理、白盒可调试性**。
 
-## 📂 目录结构说明
+它目前不是通用语义检索终局方案，尤其在以下场景仍有边界：
 
-```text
-E:\MASE-demo\
-├── langgraph_orchestrator.py   # MASE 核心引擎（基于 LangGraph）
-├── notetaker_agent.py          # 负责 SQLite 事实与流水账的读写
-├── planner_agent.py            # 负责根据记忆生成执行计划
-├── executor.py                 # 终极节点：根据上下文生成最终回复
-├── mase_cli.py                 # 记忆的物理管理面板 (CRUD)
-├── mase_tools/
-│   ├── memory/
-│   │   ├── db_core.py          # SQLite FTS5 与 Upsert 核心逻辑
-│   │   ├── api.py              # 暴露给智能体的极简读写接口
-│   │   └── gc_agent.py         # 异步记忆垃圾回收与提纯
-│   └── mcp/
-│       └── tools.py            # 外部工具集（支持 MCP 协议接入）
-└── legacy_archive/             # V1 版本的旧代码（JSON 记忆、大单体循环等），仅供参考
-```
+- 同义词 / 近义表达驱动的强语义泛化
+- 需要大规模文档级语义召回的场景
+- 高并发服务端运行时（当前主路径仍偏 CLI / benchmark / 单进程）
 
----
+## Roadmap
 
-*“最好的 AI 记忆，不应该是黑盒里的向量浮点数，而是清晰可见、人类可读、随时可被修正的结构化事实。”* — **MASE**
+- 白盒语义检索（write-time tags / read-time expansion / FTS + LLM filtering）
+- 更成熟的 async / server-grade runtime
+- 更多 benchmark triangulation
+- 更多集成面（LangChain / MCP / OpenAI compat 之外）
 
----
+## Contributing
 
-## 🤝 贡献 / Star History
+欢迎 issue / PR，尤其欢迎：
 
-### Contributing
-
-欢迎 issue / PR — 特别欢迎以下方向的贡献：
-
-- **新模型后端适配**: vLLM / llama.cpp / Together / OpenRouter 等 (`src/mase/model_interface.py`)
-- **更多 integrations**: AutoGen / CrewAI / Semantic Kernel
-- **新 benchmark 复跑**: BABILong / RULER / ∞Bench 适配 (`benchmarks/runner.py`)
-- **bug 报告**: 长上下文召回失败案例尤其欢迎，附最小复现 + `data/mase_memory.db` 片段
-
-提 PR 前请先跑 `python -m ruff check . && python -m pytest tests/ -q`，CI 全绿才能 merge。
+- 新模型后端适配
+- 新 benchmark 复跑
+- 新 integration
+- 真实世界的长记忆失败样例
 
 ### Citation
-
-如果 MASE 帮到了你的研究，请引用：
 
 ```bibtex
 @software{mase2026,
   author = {zbl1998-sdjn},
   title = {{MASE}: Memory-Augmented Smart Entity — Schema-less SQLite memory for LLM agents},
   year = {2026},
-  url = {https://github.com/zbl1998-sdjn/MASE-demo},
+  url = {https://github.com/zbl1998-sdjn/MASE},
   note = {Lifts qwen2.5:7b from 1.79\% to 60.71\% on NoLiMa-32k; 84.8\% on LongMemEval-S}
 }
 ```
-
-### Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=zbl1998-sdjn/MASE-demo&type=Date)](https://star-history.com/#zbl1998-sdjn/MASE-demo&Date)
-
-### License
-
-[Apache-2.0](LICENSE) © 2026 zbl1998-sdjn
-
----
-
-## 💡 写在最后 (A Note from the Developer)
-
-坦白讲，我只是一个**接触大模型仅 3 个月的新手**。
-
-在探索 AI 的过程中我深刻地意识到：当人们面对一个深不可测、强大到宛如黑盒的 AI 个体时，**内心的恐惧往往要大于惊喜**。我们害怕它悄悄篡改记忆，害怕它产生无法理解的幻觉，害怕失去控制权。
-
-这正是 MASE 放弃拥抱庞大黑盒、选择"双白盒"的初衷。在这个系统里：
-
-> **没有无所不能的"个人英雄主义"，只有各司其职的"齐心协力"。**
-
-我们不要求一个单一的巨型模型面面俱到，而是让 2.72 MB 的轻量级核心串联起 **Router / Notetaker / Planner / Action / Executor** 五个节点，让每个小模型各有所长，交织运作。正因为 MASE 保持了极简架构，它反而为未来的生态扩展（多智能体协同、MCP 接入、插件化）预留了无限可能。
-
-**开源的魅力就在于不需要一个人做到完美。** 如果你也认同这种透明、极简、协作的理念，欢迎加入 MASE。我们一起，各有所长，搭好这个稳固的地基。
-
-— *zbl1998-sdjn, 2026 春*
