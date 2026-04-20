@@ -27,6 +27,8 @@ MASE is a **dual-whitebox memory engine for LLM agents**.
 
 It splits agent memory into two controlled surfaces:
 
+It does not default memory to a vector database. Instead, it breaks agent memory into more controllable objects.
+
 - **Event Log** for retrieval and raw conversation history
 - **Entity Fact Sheet** for the latest structured facts that can overwrite stale state
 
@@ -95,10 +97,11 @@ agent_executor.invoke({"input": "What was my budget again?"}, config={"memory": 
 
 MASE is currently strongest at fact updates, cross-session memory, consistency control, and whitebox debuggability.
 
-- strong at fact updates, cross-session memory, consistency control, inspectable debugging
-- weaker for synonym/paraphrase-heavy semantic generalization
-- weaker for large-scale document-level semantic recall
-- current main path still favors CLI / benchmark / single-process over high-concurrency server runtime
+It is not a terminal solution for generic semantic retrieval, especially in these scenarios:
+
+- synonym- and paraphrase-heavy semantic generalization
+- large-scale document-level semantic recall
+- high-concurrency server runtime (the current main path still favors CLI / benchmark / single-process use)
 
 
 ## Roadmap
